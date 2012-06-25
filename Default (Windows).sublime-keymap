@@ -1,0 +1,3 @@
+[
+    { "keys": ["ctrl+shift+m"], "command": "require_node" }
+]
