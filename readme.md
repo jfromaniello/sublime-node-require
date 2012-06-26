@@ -7,6 +7,8 @@ Just press *ctrl+shift+m*, select the file and boom!
 * Linux: ctrl+shift+m
 * OSx: ctrl+shift+m
 
+![screencast](http://i.imgur.com/wlOrt.gif)
+
 Installation
 ============
 
