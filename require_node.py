@@ -41,7 +41,7 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
             candidate = os.path.join(current_dir, "node_modules")
             if os.path.exists(candidate):
                 for dir in [name for name in os.listdir(candidate)
-                                 if os.path.isdir(os.path.join(candidate, name))]:
+                                 if os.path.isdir(os.path.join(candidate, name)) and name != ".bin"]:
                     resolvers.append(lambda dir=dir: [dir, dir])
                     suggestions.append("module: " + dir)
                 break
@@ -71,6 +71,8 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
 
         #create suggestions for all files in the project
         for root, subFolders, files in os.walk(folder, followlinks=True):
+            if root.startswith(os.path.join(folder, "node_modules")):
+                continue
             for file in files:
                 resolvers.append(self.resolve_from_file(os.path.join(root, file)))
                 suggestions.append([file, root.replace(folder, "", 1) or file])
