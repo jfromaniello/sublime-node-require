@@ -81,6 +81,10 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
             if root.startswith(os.path.join(folder, "node_modules")):
                 continue
             for file in files:
+                if file == "index.js":
+                    resolvers.append(self.resolve_from_file(root))
+                    suggestions.append([os.path.split(root)[1], root])
+                    continue
                 resolvers.append(self.resolve_from_file(os.path.join(root, file)))
                 suggestions.append([file, root.replace(folder, "", 1) or file])
 
