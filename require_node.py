@@ -3,14 +3,21 @@ import os
 from subprocess import Popen, PIPE
 from tempfile import SpooledTemporaryFile as tempfile
 import json
+import string
 
 
 class RequireNodeCommand(sublime_plugin.TextCommand):
+
     def write_require(self, resolvers, edit):
         def write(index):
             if index == -1:
                 return
             [module_candidate_name, module_rel_path] = resolvers[index]()
+
+            if module_candidate_name.find("-") != -1:
+                upperWords = [string.capitalize(word) for word in module_candidate_name.split("-")[1::]]
+                module_candidate_name = string.join(module_candidate_name.split("-")[0:1] + upperWords, "")
+
             require_directive = "%s = require(\"%s\")" % (module_candidate_name, module_rel_path)
             region = self.view.sel()[0]
             # self.view.sel().clear()
