@@ -33,10 +33,10 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
             module_candidate_name = os.path.basename(file_wo_ext).replace(".", "")
             module_rel_path = os.path.relpath(file_wo_ext, os.path.dirname(file))
 
-            if module_rel_path[:3] != "../":
-                module_rel_path = "./" + module_rel_path
+            if module_rel_path[:3] != ".." + os.path.sep:
+                module_rel_path = "." + os.path.sep + module_rel_path
 
-            return [module_candidate_name, module_rel_path]
+            return [module_candidate_name, module_rel_path.replace(os.path.sep, "/")]
         return resolve
 
     def get_suggestion_from_nodemodules(self):
