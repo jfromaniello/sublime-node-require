@@ -21,9 +21,8 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
 
             require_directive = "%s = require(%s)" % (module_candidate_name, get_path(module_rel_path) )
             region = self.view.sel()[0]
-            # self.view.sel().clear()
             self.view.insert(edit, region.a, require_directive)
-            # self.view.sel().add(sublime.Region(region.a, region.a + len(module_candidate_name)))
+            self.view.run_command("reindent", {"single_line": True})
 
         def get_path(path):
             settings = sublime.load_settings(__name__ + '.sublime-settings')
