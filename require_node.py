@@ -19,7 +19,7 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
                 upperWords = [string.capitalize(word) for word in module_candidate_name.split("-")[1::]]
                 module_candidate_name = string.join(module_candidate_name.split("-")[0:1] + upperWords, "")
 
-            require_directive = "%s = require(%s)" % (module_candidate_name, get_path(module_rel_path) )
+            require_directive = "%s = require(%s)" % (module_candidate_name, get_path(module_rel_path))
             region = self.view.sel()[0]
             self.view.insert(edit, region.a, require_directive)
             self.view.run_command("reindent", {"single_line": True})
@@ -27,10 +27,10 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
         def get_path(path):
             settings = sublime.load_settings(__name__ + '.sublime-settings')
             quotes_type = settings.get('quotes_type')
-            quote = "\""
-            if quotes_type == "simple":
-                quote = "'"
-            return quote+path+quote
+            quote = "'"
+            if quotes_type == "double":
+                quote = "\""
+            return quote + path + quote
 
         return write
 
