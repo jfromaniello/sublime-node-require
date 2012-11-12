@@ -1,0 +1,3 @@
+{
+    "quotes_type": "double" /* double, if it is't the default is simple */
+}
