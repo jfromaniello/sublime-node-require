@@ -88,6 +88,8 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
         for root, subFolders, files in os.walk(folder, followlinks=True):
             if root.startswith(os.path.join(folder, "node_modules")):
                 continue
+            if root.startswith(os.path.join(folder, ".git")):
+                continue
             for file in files:
                 if file == "index.js":
                     resolvers.append(self.resolve_from_file(root))
