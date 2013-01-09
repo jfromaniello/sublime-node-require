@@ -9,16 +9,22 @@ Just press *ctrl+shift+m*, select the file and boom!
 
 ![screencast](http://i.imgur.com/wlOrt.gif)
 
-Other modules
-=============
+## Other modules
 
 Besides any javascript file you have in your directory, use:
 
 * native: [name] for things like "fs", "net", etc.
 * module: [name] for modules inside your node_modules folder
-* 
 
-Installation
-============
 
-Install it using Sublime Text 2 package control. Search for "require node.js"
+## Installation
+
+### With Package Control
+
+Search for something as "require node.js"
+
+### With [Package Decontrol](https://github.com/jfromaniello/Sublime-Package-Decontrol)
+
+~~~
+jfromaniello/sublime-node-require
+~~~
