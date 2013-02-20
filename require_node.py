@@ -74,7 +74,7 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
             f = tempfile()
             f.write('console.log(Object.keys(process.binding("natives")))')
             f.seek(0)
-            jsresult = (Popen(['node'], stdout=PIPE, stdin=f)).stdout.read().replace("'", '"')
+            jsresult = (Popen(['node'], stdout=PIPE, stdin=f, shell=True)).stdout.read().replace("'", '"')
             f.close()
 
             results = json.loads(jsresult)
