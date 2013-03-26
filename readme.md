@@ -5,7 +5,7 @@ Just press *ctrl+shift+m*, select the file and boom!
 
 * Windows: ctrl+shift+m
 * Linux: ctrl+shift+m
-* OSx: ctrl+shift+m
+* OSx: ⌘+⇧+m (command+shift+m)
 
 ![screencast](http://i.imgur.com/wlOrt.gif)
 
