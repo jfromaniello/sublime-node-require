@@ -1,3 +1,4 @@
 {
     "quotes_type": "simple" /* use 'double', for double quotes */
+    , "project_type": "js" /* use 'coffee' for CoffeeScript (matches the file extension) */
 }

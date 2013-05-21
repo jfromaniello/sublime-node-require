@@ -22,10 +22,23 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
             region_to_insert = self.view.sel()[0]
             line_is_empty = self.view.lines(region_to_insert)[0].empty()
 
+            settings = sublime.load_settings(__name__ + '.sublime-settings')
+            project_type = settings.get('project_type')
+
+            full_template = {
+                'coffee': "%s = require %s",
+                'js': "var %s = require(%s);",
+            }[project_type]
+
+            partial_template = {
+                'coffee': "require %s",
+                'js': "require(%s);",
+            }[project_type]
+
             if line_is_empty:
-                require_directive = "var %s = require(%s);" % (module_candidate_name, get_path(module_rel_path))
+                require_directive = full_template % (module_candidate_name, get_path(module_rel_path))
             else:
-                require_directive = "require(%s)" % (get_path(module_rel_path))
+                require_directive = partial_template % (get_path(module_rel_path))
 
             self.view.insert(edit, region_to_insert.a, require_directive)
             # self.view.run_command("reindent", {"single_line": True})
