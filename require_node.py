@@ -9,6 +9,18 @@ import string
 
 class RequireNodeCommand(sublime_plugin.TextCommand):
 
+    project_type = ''
+
+    full_template = {
+        'js': "var %s = require(%s);",
+        'coffee': "%s = require %s",
+    }
+
+    partial_template = {
+        'js': "require(%s);",
+        'coffee': "require %s",
+    }
+
     def write_require(self, resolvers, edit):
         def write(index):
             if index == -1:
@@ -22,23 +34,10 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
             region_to_insert = self.view.sel()[0]
             line_is_empty = self.view.lines(region_to_insert)[0].empty()
 
-            settings = sublime.load_settings(__name__ + '.sublime-settings')
-            project_type = settings.get('project_type')
-
-            full_template = {
-                'coffee': "%s = require %s",
-                'js': "var %s = require(%s);",
-            }[project_type]
-
-            partial_template = {
-                'coffee': "require %s",
-                'js': "require(%s);",
-            }[project_type]
-
             if line_is_empty:
-                require_directive = full_template % (module_candidate_name, get_path(module_rel_path))
+                require_directive = self.full_template[self.project_type] % (module_candidate_name, get_path(module_rel_path))
             else:
-                require_directive = partial_template % (get_path(module_rel_path))
+                require_directive = self.partial_template[self.project_type] % (get_path(module_rel_path))
 
             self.view.insert(edit, region_to_insert.a, require_directive)
             # self.view.run_command("reindent", {"single_line": True})
@@ -104,7 +103,7 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
         resolvers = []
 
         settings = sublime.load_settings(__name__ + '.sublime-settings')
-        project_type = settings.get('project_type')
+        self.project_type = settings.get('project_type')
 
         #create suggestions for all files in the project
         for root, subFolders, files in os.walk(folder, followlinks=True):
@@ -113,7 +112,7 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
             if root.startswith(os.path.join(folder, ".git")):
                 continue
             for file in files:
-                if file == "index." + project_type:
+                if file == "index." + self.project_type:
                     resolvers.append(self.resolve_from_file(root))
                     suggestions.append([os.path.split(root)[1], root])
                     continue
