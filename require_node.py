@@ -103,6 +103,9 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
         suggestions = []
         resolvers = []
 
+        settings = sublime.load_settings(__name__ + '.sublime-settings')
+        project_type = settings.get('project_type')
+
         #create suggestions for all files in the project
         for root, subFolders, files in os.walk(folder, followlinks=True):
             if root.startswith(os.path.join(folder, "node_modules")):
@@ -110,7 +113,7 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
             if root.startswith(os.path.join(folder, ".git")):
                 continue
             for file in files:
-                if file == "index.js":
+                if file == "index." + project_type:
                     resolvers.append(self.resolve_from_file(root))
                     suggestions.append([os.path.split(root)[1], root])
                     continue
