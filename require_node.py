@@ -9,19 +9,21 @@ import string
 
 class RequireNodeCommand(sublime_plugin.TextCommand):
 
-    project_type = ''
-
-    full_template = {
-        'js': "var %s = require(%s);",
-        'coffee': "%s = require %s",
-    }
-
-    partial_template = {
-        'js': "require(%s);",
-        'coffee': "require %s",
-    }
-
     def write_require(self, resolvers, edit):
+
+        current_lang = self.view.scope_name(self.view.sel()[0].a).split(' ')[0]
+
+        clause_formats = {
+            "source.js": {
+                True:  "var {0} = require({1});",
+                False: "require({1})"
+            },
+            "source.coffee": {
+                True:  "{0} = require({1})",
+                False: "require({1})"
+            }
+        }
+
         def write(index):
             if index == -1:
                 return
@@ -32,22 +34,17 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
                 module_candidate_name = string.join(module_candidate_name.split("-")[0:1] + upperWords, "")
 
             region_to_insert = self.view.sel()[0]
+
             line_is_empty = self.view.lines(region_to_insert)[0].empty()
 
-            if line_is_empty:
-                require_directive = self.full_template[self.project_type] % (module_candidate_name, get_path(module_rel_path))
-            else:
-                require_directive = self.partial_template[self.project_type] % (get_path(module_rel_path))
+            require_directive = clause_formats[current_lang][line_is_empty].format(module_candidate_name, get_path(module_rel_path))
 
             self.view.insert(edit, region_to_insert.a, require_directive)
-            # self.view.run_command("reindent", {"single_line": True})
 
         def get_path(path):
             settings = sublime.load_settings(__name__ + '.sublime-settings')
             quotes_type = settings.get('quotes_type')
-            quote = "'"
-            if quotes_type == "double":
-                quote = "\""
+            quote = "\"" if quotes_type == "double" else "'"
             return quote + path + quote
 
         return write
@@ -102,9 +99,6 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
         suggestions = []
         resolvers = []
 
-        settings = sublime.load_settings(__name__ + '.sublime-settings')
-        self.project_type = settings.get('project_type')
-
         #create suggestions for all files in the project
         for root, subFolders, files in os.walk(folder, followlinks=True):
             if root.startswith(os.path.join(folder, "node_modules")):
@@ -112,7 +106,7 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
             if root.startswith(os.path.join(folder, ".git")):
                 continue
             for file in files:
-                if file == "index." + self.project_type:
+                if file == "index.js" or file == "index.coffee":
                     resolvers.append(self.resolve_from_file(root))
                     suggestions.append([os.path.split(root)[1], root])
                     continue
@@ -128,5 +122,6 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
         [resolvers_from_native, suggestions_from_nm] = self.get_suggestion_native_modules()
         resolvers += resolvers_from_native
         suggestions += suggestions_from_nm
+
 
         self.view.window().show_quick_panel(suggestions, self.write_require(resolvers, edit))
