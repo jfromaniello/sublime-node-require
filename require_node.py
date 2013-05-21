@@ -19,8 +19,8 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
                 False: "require({1})"
             },
             "source.coffee": {
-                True:  "{0} = require({1})",
-                False: "require({1})"
+                True:  "{0} = require {1}",
+                False: "require {1}"
             }
         }
 
