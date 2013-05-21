@@ -7,7 +7,7 @@ Just press *ctrl+shift+m*, select the file and boom!
 * Linux: ctrl+shift+m
 * OSx: ⌘+⇧+m (command+shift+m)
 
-![screencast](http://i.imgur.com/wlOrt.gif)
+![screencast](http://joseoncodecom.ipage.com/wp-content/uploads/images/require-helper.gif)
 
 ## Other modules
 
