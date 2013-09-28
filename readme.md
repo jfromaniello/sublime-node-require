@@ -21,7 +21,7 @@ Besides any javascript file you have in your directory, use:
 
 ### With Package Control
 
-Search for something as "require node.js"
+Search "Require Node.js Modules Helper".
 
 ### With [Package Decontrol](https://github.com/jfromaniello/Sublime-Package-Decontrol)
 
