@@ -1,15 +1,19 @@
 import sublime
 import sublime_plugin
 import os
+import sys
+
+if sys.version_info[0] == 2:
+    from Edit import Edit as Edit
+else:
+    from .Edit import Edit as Edit
+
 from subprocess import Popen, PIPE
 from tempfile import SpooledTemporaryFile as tempfile
 import json
-import string
-
 
 class RequireNodeCommand(sublime_plugin.TextCommand):
-
-    def write_require(self, resolvers, edit):
+    def write_require(self, resolvers):
 
         current_lang = self.view.scope_name(self.view.sel()[0].a).split(' ')[0]
 
@@ -30,8 +34,8 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
             [module_candidate_name, module_rel_path] = resolvers[index]()
 
             if module_candidate_name.find("-") != -1:
-                upperWords = [string.capitalize(word) for word in module_candidate_name.split("-")[1::]]
-                module_candidate_name = string.join(module_candidate_name.split("-")[0:1] + upperWords, "")
+                upperWords = [word.capitalize() for word in module_candidate_name.split("-")[1::]]
+                module_candidate_name = "".join(module_candidate_name.split("-")[0:1] + upperWords)
 
             region_to_insert = self.view.sel()[0]
 
@@ -39,7 +43,8 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
 
             require_directive = clause_formats[current_lang][line_is_empty].format(module_candidate_name, get_path(module_rel_path))
 
-            self.view.insert(edit, region_to_insert.a, require_directive)
+            with Edit(self.view) as edit:
+                edit.insert(region_to_insert.a, require_directive)
 
         def get_path(path):
             settings = sublime.load_settings(__name__ + '.sublime-settings')
@@ -95,6 +100,8 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
             return [[], []]
 
     def run(self, edit):
+        self.edit = edit;
+
         folder = self.view.window().folders()[0]
         suggestions = []
         resolvers = []
@@ -123,5 +130,4 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
         resolvers += resolvers_from_native
         suggestions += suggestions_from_nm
 
-
-        self.view.window().show_quick_panel(suggestions, self.write_require(resolvers, edit))
+        self.view.window().show_quick_panel(suggestions, self.write_require(resolvers))
