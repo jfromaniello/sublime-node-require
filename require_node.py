@@ -8,9 +8,42 @@ if sys.version_info[0] == 2:
 else:
     from .Edit import Edit as Edit
 
-from subprocess import Popen, PIPE
-from tempfile import SpooledTemporaryFile as tempfile
-import json
+
+NODE_NATIVE = [
+    'assert',
+    'buffer',
+    'child_process',
+    'console',
+    'constants',
+    'crypto',
+    'cluster',
+    'dgram',
+    'dns',
+    'domain',
+    'events',
+    'freelist',
+    'fs',
+    'http',
+    'https',
+    'module',
+    'net',
+    'os',
+    'path',
+    'punycode',
+    'querystring',
+    'readline',
+    'repl',
+    'stream',
+    'string_decoder',
+    'sys',
+    'timers',
+    'tls',
+    'tty',
+    'url',
+    'util',
+    'vm',
+    'zlib'
+]
 
 class RequireNodeCommand(sublime_plugin.TextCommand):
     def write_require(self, resolvers):
@@ -56,7 +89,7 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
 
     def resolve_from_file(self, full_path):
         def resolve():
-            file = self.view.file_name()
+            file = self.current_file
             file_wo_ext = os.path.splitext(full_path)[0]
             module_candidate_name = os.path.basename(file_wo_ext).replace(".", "")
             module_rel_path = os.path.relpath(file_wo_ext, os.path.dirname(file))
@@ -70,8 +103,8 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
     def get_suggestion_from_nodemodules(self):
         resolvers = []
         suggestions = []
-        current_file_dirs = self.view.file_name().split(os.path.sep)
-        current_dir = os.path.split(self.view.file_name())[0]
+        current_file_dirs = self.current_file.split(os.path.sep)
+        current_dir = os.path.split(self.current_file)[0]
         for x in range(len(self.view.window().folders()[0].split(os.path.sep)), len(current_file_dirs))[::-1]:
             candidate = os.path.join(current_dir, "node_modules")
             if os.path.exists(candidate):
@@ -84,23 +117,14 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
         return [resolvers, suggestions]
 
     def get_suggestion_native_modules(self):
-        try:
-            f = tempfile()
-            f.write('console.log(Object.keys(process.binding("natives")))')
-            f.seek(0)
-            jsresult = (Popen(['node'], stdout=PIPE, stdin=f, shell=True)).stdout.read().replace("'", '"')
-            f.close()
+        result = [[(lambda ni=ni: [ni, ni]) for ni in NODE_NATIVE],
+                ["native: " + ni for ni in NODE_NATIVE]]
 
-            results = json.loads(jsresult)
-
-            result = [[(lambda ni=ni: [ni, ni]) for ni in results],
-                    ["native: " + ni for ni in results]]
-            return result
-        except Exception:
-            return [[], []]
+        return result
 
     def run(self, edit):
-        self.edit = edit;
+        self.edit = edit
+        self.current_file = self.view.file_name()
 
         folder = self.view.window().folders()[0]
         suggestions = []
