@@ -72,7 +72,7 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
                 return
             [module_candidate_name, module_name] = resolvers[index]()
 
-            module_candidate_name = KNOWN_REQUIRES[module_name] or module_candidate_name
+            module_candidate_name = KNOWN_REQUIRES.get(module_name, module_candidate_name)
 
             if module_candidate_name.find("-") != -1:
                 upperWords = [word.capitalize() for word in module_candidate_name.split("-")[1::]]
