@@ -45,6 +45,12 @@ NODE_NATIVE = [
     'zlib'
 ]
 
+KNOWN_REQUIRES = {
+    'lodash':     '_',
+    'underscore': '_',
+    'jquery':     '$'
+}
+
 class RequireNodeCommand(sublime_plugin.TextCommand):
     def write_require(self, resolvers):
 
@@ -64,7 +70,9 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
         def write(index):
             if index == -1:
                 return
-            [module_candidate_name, module_rel_path] = resolvers[index]()
+            [module_candidate_name, module_name] = resolvers[index]()
+
+            module_candidate_name = KNOWN_REQUIRES[module_name] or module_candidate_name
 
             if module_candidate_name.find("-") != -1:
                 upperWords = [word.capitalize() for word in module_candidate_name.split("-")[1::]]
@@ -74,7 +82,7 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
 
             line_is_empty = self.view.lines(region_to_insert)[0].empty()
 
-            require_directive = clause_formats[current_lang][line_is_empty].format(module_candidate_name, get_path(module_rel_path))
+            require_directive = clause_formats[current_lang][line_is_empty].format(module_candidate_name, get_path(module_name))
 
             with Edit(self.view) as edit:
                 edit.insert(region_to_insert.a, require_directive)
