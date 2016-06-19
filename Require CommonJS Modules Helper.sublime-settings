@@ -1,0 +1,51 @@
+{
+    "quotes_type": "simple", /* use 'double', for double quotes */
+
+    "source_js_new_line": "var {0} = require({1});",
+    "source_js_existing_line": "require({1})",
+
+    "source_coffee_new_line": "{0} = require {1}",
+    "source_coffee_existing_line": "require {1}",
+
+    "node_native": [
+        "assert",
+        "buffer",
+        "child_process",
+        "console",
+        "constants",
+        "crypto",
+        "cluster",
+        "dgram",
+        "dns",
+        "domain",
+        "events",
+        "freelist",
+        "fs",
+        "http",
+        "https",
+        "module",
+        "net",
+        "os",
+        "path",
+        "punycode",
+        "querystring",
+        "readline",
+        "repl",
+        "stream",
+        "string_decoder",
+        "sys",
+        "timers",
+        "tls",
+        "tty",
+        "url",
+        "util",
+        "vm",
+        "zlib"
+    ],
+
+    "known_requires": {
+        "lodash": "_",
+        "underscore": "_",
+        "jquery": "$"
+    }
+}

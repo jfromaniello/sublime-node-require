@@ -8,71 +8,21 @@ if sys.version_info[0] == 2:
 else:
     from .Edit import Edit as Edit
 
-
-NODE_NATIVE = [
-    'assert',
-    'buffer',
-    'child_process',
-    'console',
-    'constants',
-    'crypto',
-    'cluster',
-    'dgram',
-    'dns',
-    'domain',
-    'events',
-    'freelist',
-    'fs',
-    'http',
-    'https',
-    'module',
-    'net',
-    'os',
-    'path',
-    'punycode',
-    'querystring',
-    'readline',
-    'repl',
-    'stream',
-    'string_decoder',
-    'sys',
-    'timers',
-    'tls',
-    'tty',
-    'url',
-    'util',
-    'vm',
-    'zlib'
-]
-
-KNOWN_REQUIRES = {
-    'lodash':     '_',
-    'underscore': '_',
-    'jquery':     '$'
-}
+SETTINGS = 'Require CommonJS Modules Helper.sublime-settings'
 
 class RequireNodeCommand(sublime_plugin.TextCommand):
     def write_require(self, resolvers):
-
         current_lang = self.view.scope_name(self.view.sel()[0].a).split(' ')[0]
-
-        clause_formats = {
-            "source.js": {
-                True:  "var {0} = require({1});",
-                False: "require({1})"
-            },
-            "source.coffee": {
-                True:  "{0} = require {1}",
-                False: "require {1}"
-            }
-        }
 
         def write(index):
             if index == -1:
                 return
             [module_candidate_name, module_name] = resolvers[index]()
 
-            module_candidate_name = KNOWN_REQUIRES.get(module_name, module_candidate_name)
+            settings = sublime.load_settings(SETTINGS)
+
+            known_requires = settings.get('known_requires')
+            module_candidate_name = known_requires.get(module_name, module_candidate_name)
 
             if module_candidate_name.find("-") != -1:
                 upperWords = [word.capitalize() for word in module_candidate_name.split("-")[1::]]
@@ -82,14 +32,24 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
 
             line_is_empty = self.view.lines(region_to_insert)[0].empty()
 
+            clause_formats = {
+                "source.js": {
+                    True:  settings.get('source_js_new_line'),
+                    False: settings.get('source_js_existing_line')
+                },
+                "source.coffee": {
+                    True:  settings.get('source_coffee_new_line'),
+                    False: settings.get('source_coffee_existing_line')
+                }
+            }
+
             require_directive = clause_formats[current_lang][line_is_empty].format(module_candidate_name, get_path(module_name))
 
             with Edit(self.view) as edit:
                 edit.insert(region_to_insert.a, require_directive)
 
         def get_path(path):
-            settings = sublime.load_settings(__name__ + '.sublime-settings')
-            quotes_type = settings.get('quotes_type')
+            quotes_type = sublime.load_settings(SETTINGS).get('quotes_type')
             quote = "\"" if quotes_type == "double" else "'"
             return quote + path + quote
 
@@ -125,8 +85,9 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
         return [resolvers, suggestions]
 
     def get_suggestion_native_modules(self):
-        result = [[(lambda ni=ni: [ni, ni]) for ni in NODE_NATIVE],
-                ["native: " + ni for ni in NODE_NATIVE]]
+        node_native = sublime.load_settings(SETTINGS).get('node_native')
+        result = [[(lambda ni=ni: [ni, ni]) for ni in node_native],
+                ["native: " + ni for ni in node_native]]
 
         return result
 
