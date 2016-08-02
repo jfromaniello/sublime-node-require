@@ -40,6 +40,10 @@ class RequireNodeCommand(sublime_plugin.TextCommand):
                 "source.coffee": {
                     True:  settings.get('source_coffee_new_line'),
                     False: settings.get('source_coffee_existing_line')
+                },
+                "text.html.riot": {
+                    True:  settings.get('source_js_new_line'),
+                    False: settings.get('source_js_existing_line')
                 }
             }
 
